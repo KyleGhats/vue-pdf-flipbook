@@ -56,6 +56,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KyleGhats/vue-pdf-flipbook.git"
+    "url": "git+https://github.com/KyleGhats/vue-pdf-flipbook.git"
+  },
+  "homepage": "https://github.com/KyleGhats/vue-pdf-flipbook#readme",
+  "bugs": {
+    "url": "https://github.com/KyleGhats/vue-pdf-flipbook/issues"
   }
 }

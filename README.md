@@ -1,40 +1,24 @@
-# vue-pdf-flipbook
+# @kyle_g/vue-pdf-flipbook
 
 Headless Vue 3 composables for a WebGL PDF flipbook powered by [turngl](https://github.com/ogi/turngl) and [pdf.js](https://mozilla.github.io/pdf.js/).
 
 Bring your own UI — wire a canvas, overlay chrome, and navigation buttons however you like.
 
+- **npm:** [@kyle_g/vue-pdf-flipbook](https://www.npmjs.com/package/@kyle_g/vue-pdf-flipbook)
+- **GitHub:** [KyleGhats/vue-pdf-flipbook](https://github.com/KyleGhats/vue-pdf-flipbook)
+
 ## Install
 
-From npm (after publishing):
-
 ```bash
-npm install vue-pdf-flipbook
-```
-
-From GitHub:
-
-```bash
-npm install github:YOUR_GITHUB_USERNAME/vue-pdf-flipbook
+npm install @kyle_g/vue-pdf-flipbook
 ```
 
 Peer dependency: Vue 3.5+.
 
-## Publish to GitHub
-
-GitHub CLI is the fastest path. From this directory:
+Install from GitHub (without npm):
 
 ```bash
-gh auth login
-gh repo create vue-pdf-flipbook --public --source=. --remote=origin --push
-```
-
-Then update `repository`, `homepage`, and `bugs` in `package.json` with your GitHub username.
-
-To publish on npm later:
-
-```bash
-npm publish
+npm install github:KyleGhats/vue-pdf-flipbook
 ```
 
 ## Quick start
@@ -43,10 +27,11 @@ npm publish
 <script setup lang="ts">
 import { ref, watch, nextTick, onBeforeUnmount } from "vue";
 import { useResizeObserver } from "@vueuse/core";
-import { usePdfFlipbook } from "vue-pdf-flipbook";
+import { usePdfFlipbook } from "@kyle_g/vue-pdf-flipbook";
 
 const props = defineProps<{ open: boolean; pdfUrl?: string }>();
 
+const overlayRef = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const stageRef = ref<HTMLDivElement | null>(null);
 
@@ -67,17 +52,45 @@ const {
   dispose,
 } = usePdfFlipbook();
 
+const measureSizes = () => {
+  const overlay = overlayRef.value?.getBoundingClientRect();
+  if (!overlay?.width || !overlay?.height) return null;
+  const stage = stageRef.value?.getBoundingClientRect();
+  return {
+    canvasWidth: overlay.width,
+    canvasHeight: overlay.height,
+    fitWidth: stage?.width ?? overlay.width,
+    fitHeight: stage?.height ?? overlay.height,
+  };
+};
+
 const boot = async () => {
-  if (!props.pdfUrl || !canvasRef.value || !stageRef.value) return;
-  const { width, height } = stageRef.value.getBoundingClientRect();
-  init(canvasRef.value, width, height);
+  if (!props.pdfUrl || !canvasRef.value || !overlayRef.value) return;
+  const sizes = measureSizes();
+  if (!sizes) return;
+  init(
+    canvasRef.value,
+    sizes.canvasWidth,
+    sizes.canvasHeight,
+    sizes.fitWidth,
+    sizes.fitHeight,
+  );
   await load(props.pdfUrl);
 };
 
-useResizeObserver(stageRef, (entries) => {
-  const { width, height } = entries[0]?.contentRect ?? {};
-  if (width && height) resize(width, height);
-});
+const syncViewerSize = () => {
+  const sizes = measureSizes();
+  if (!sizes) return;
+  resize(
+    sizes.canvasWidth,
+    sizes.canvasHeight,
+    sizes.fitWidth,
+    sizes.fitHeight,
+  );
+};
+
+useResizeObserver(overlayRef, () => syncViewerSize());
+useResizeObserver(stageRef, () => syncViewerSize());
 
 watch(
   () => props.open,
@@ -95,18 +108,19 @@ onBeforeUnmount(dispose);
 </script>
 
 <template>
-  <div v-if="open" class="flipbook-overlay">
+  <div v-if="open" ref="overlayRef" class="flipbook-overlay">
+    <canvas
+      ref="canvasRef"
+      class="flipbook-canvas"
+      :class="{ 'is-flipping': isFlipping }"
+    />
+
     <header>
       <p v-if="pageLabel">{{ pageLabel }}</p>
-      <p v-if="!loading && !error">Drag a page corner to flip</p>
+      <p v-if="!loading && !error && !preparingPage">Drag a page corner to flip</p>
     </header>
 
     <div ref="stageRef" class="flipbook-stage">
-      <canvas
-        ref="canvasRef"
-        class="flipbook-canvas"
-        :class="{ 'is-flipping': isFlipping }"
-      />
       <p v-if="loading">Loading…</p>
       <p v-else-if="error">{{ error }}</p>
       <p v-else-if="preparingPage">Preparing page…</p>
@@ -162,14 +176,14 @@ Pure functions for cover/spread/end book layout:
 - `flipPageNumbersForView(viewIndex, dir, total)`
 - `pagesForView(viewIndex, total)`
 
-## Nuxt / Vite notes
+## Nuxt / Vite
 
 Add to `nuxt.config.ts` (or Vite `optimizeDeps.include`):
 
 ```ts
 vite: {
   optimizeDeps: {
-    include: ["vue-pdf-flipbook", "pdfjs-dist", "turngl"],
+    include: ["@kyle_g/vue-pdf-flipbook", "pdfjs-dist", "turngl"],
   },
 },
 ```
@@ -177,6 +191,22 @@ vite: {
 PDFs must be fetchable from the browser (CORS). Pass a direct URL to `load()`.
 
 For full-viewport canvas with header/footer overlay during flips, size the canvas to the overlay and pass the stage dimensions as `fitWidth` / `fitHeight` to `init` and `resize`. Raise canvas `z-index` while `isFlipping` is true.
+
+## Development
+
+```bash
+npm install
+npm run build
+npm test
+```
+
+Publish to npm:
+
+```bash
+npm publish --access public
+```
+
+Scoped packages require `--access public` on first publish (or set `publishConfig.access` in `package.json`).
 
 ## License
 
