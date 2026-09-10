@@ -192,22 +192,6 @@ PDFs must be fetchable from the browser (CORS). Pass a direct URL to `load()`.
 
 For full-viewport canvas with header/footer overlay during flips, size the canvas to the overlay and pass the stage dimensions as `fitWidth` / `fitHeight` to `init` and `resize`. Raise canvas `z-index` while `isFlipping` is true.
 
-## Development
-
-```bash
-npm install
-npm run build
-npm test
-```
-
-Publish to npm:
-
-```bash
-npm publish --access public
-```
-
-Scoped packages require `--access public` on first publish (or set `publishConfig.access` in `package.json`).
-
 ## License
 
 MIT
