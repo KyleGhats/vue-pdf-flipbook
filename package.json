@@ -1,6 +1,6 @@
 {
   "name": "@kyle_g/vue-pdf-flipbook",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Headless Vue 3 composables for a WebGL PDF flipbook powered by turngl and pdf.js",
   "type": "module",
   "license": "MIT",
