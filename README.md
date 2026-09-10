@@ -178,6 +178,19 @@ Pure functions for cover/spread/end book layout:
 
 ## Nuxt / Vite
 
+Add a **client plugin** so pdf.js can resolve its worker under Vite:
+
+```ts
+// app/plugins/pdf-worker.client.ts
+import { setupPdfWorker } from "@kyle_g/vue-pdf-flipbook";
+
+export default defineNuxtPlugin(() => {
+  setupPdfWorker(
+    new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).href,
+  );
+});
+```
+
 Add to `nuxt.config.ts` (or Vite `optimizeDeps.include`):
 
 ```ts

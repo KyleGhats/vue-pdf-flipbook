@@ -2,8 +2,6 @@ import { ref } from "vue";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { ensurePdfWorker, pdfjsLib } from "../setup/pdfWorker";
 
-ensurePdfWorker();
-
 const MIN_RENDER_WIDTH = 1200;
 const MAX_RENDER_WIDTH = 4096;
 
@@ -41,6 +39,7 @@ export const usePdfDocument = () => {
   };
 
   const loadPdf = async (url: string) => {
+    ensurePdfWorker();
     loading.value = true;
     error.value = null;
     cache.clear();
