@@ -1,0 +1,58 @@
+{
+  "name": "vue-pdf-flipbook",
+  "version": "0.1.0",
+  "description": "Headless Vue 3 composables for a WebGL PDF flipbook powered by turngl and pdf.js",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": [
+    "./dist/index.mjs",
+    "./dist/index.cjs"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^4.10.38",
+    "three": "^0.170.0",
+    "turngl": "^0.2.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.170.0",
+    "typescript": "^5.9.2",
+    "unbuild": "^3.6.1",
+    "vitest": "^3.2.4",
+    "vue": "^3.5.40"
+  },
+  "keywords": [
+    "vue",
+    "pdf",
+    "flipbook",
+    "turngl",
+    "pdfjs",
+    "webgl"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/vue-pdf-flipbook.git"
+  }
+}
